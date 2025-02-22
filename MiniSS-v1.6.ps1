@@ -1,11 +1,11 @@
-﻿$ErrorActionPreference = "SilentlyContinue"
+$ErrorActionPreference = "SilentlyContinue"
 clear-host
 function MainMenu {
 cls
 Logo                                                          
 Write-Host @"
         [1] Prefetch Tool's            [6] LastActivityView
-        [2] Service-Execution          [7] SystemInformer
+        [2] Pcasvc-Execution           [7] SystemInformer
         [3] Everything                 [8] BAM Tool's
         [4] Convertor's Tool           [9] Signatures Tool's
         [5] ExecutedProgramsList       [0] MACETA
@@ -32,23 +32,29 @@ Write-Host -ForegroundColor Yellow "        [Exit] Exit and close Script Tool"
 function Logo {
 Write-Host @"
 
-    ███╗   ███╗██╗███╗   ██╗██╗    ███████╗███████╗
-    ████╗ ████║██║████╗  ██║██║    ██╔════╝██╔════╝
-    ██╔████╔██║██║██╔██╗ ██║██║    ███████╗███████╗
-    ██║╚██╔╝██║██║██║╚██╗██║██║    ╚════██║╚════██║
-    ██║ ╚═╝ ██║██║██║ ╚████║██║    ███████║███████║
-    ╚═╝     ╚═╝╚═╝╚═╝  ╚═══╝╚═╝    ╚══════╝╚══════╝
+                            ███╗   ███╗██╗███╗   ██╗██╗    ███████╗███████╗
+                            ████╗ ████║██║████╗  ██║██║    ██╔════╝██╔════╝
+                            ██╔████╔██║██║██╔██╗ ██║██║    ███████╗███████╗
+                            ██║╚██╔╝██║██║██║╚██╗██║██║    ╚════██║╚════██║
+                            ██║ ╚═╝ ██║██║██║ ╚████║██║    ███████║███████║
+                            ╚═╝     ╚═╝╚═╝╚═╝  ╚═══╝╚═╝    ╚══════╝╚══════╝
                                                
-    ████████╗ ██████╗  ██████╗ ██╗                 
-    ╚══██╔══╝██╔═══██╗██╔═══██╗██║                 
-       ██║   ██║   ██║██║   ██║██║                 
-       ██║   ██║   ██║██║   ██║██║                 
-       ██║   ╚██████╔╝╚██████╔╝███████╗            
-       ╚═╝    ╚═════╝  ╚═════╝ ╚══════╝  
-                                     
+                            ████████╗ ██████╗  ██████╗ ██╗                 
+                            ╚══██╔══╝██╔═══██╗██╔═══██╗██║                 
+                               ██║   ██║   ██║██║   ██║██║                 
+                               ██║   ██║   ██║██║   ██║██║                 
+                               ██║   ╚██████╔╝╚██████╔╝███████╗            
+                               ╚═╝    ╚═════╝  ╚═════╝ ╚══════╝  
+       ════════════════════════════════════════════════════════════════════════════════════════════════════
 "@ -ForegroundColor Red                                                           
-    Write-Host -ForegroundColor Blue "      By Smooth | Discord: smoothzada"
+    Write-Host -ForegroundColor Blue "       By Smooth | Discord: smoothzada"
     Write-Host ""
+}
+function Test-Admin {;$currentUser = New-Object Security.Principal.WindowsPrincipal $([Security.Principal.WindowsIdentity]::GetCurrent());$currentUser.IsInRole([Security.Principal.WindowsBuiltinRole]::Administrator);}
+if (!(Test-Admin)) {
+    Write-Warning "Execute o script como Administrador"
+    Start-Sleep 5
+    Exit
 }
 function PathVerify {
     param (
@@ -64,7 +70,6 @@ function PathVerify {
         return $false
     }
 }
-
     do {
         Logo
         $OutfilePath = Read-Host "Digite o caminho completo da pasta"
@@ -72,7 +77,6 @@ function PathVerify {
     } while (-not $foundPath)
 
 cls
-
 MainMenu
 
 while ($true) {
@@ -123,16 +127,16 @@ while ($true) {
     $prefetchFiles = Get-ChildItem -Path C:\Windows\Prefetch -File -Force | 
         Sort-Object LastWriteTime -Descending
 
-    # Etapa 1: ReadOnly or Hidden .pf
+    # Etapa 1
     $readOnlyFiles = $prefetchFiles | Where-Object { $_.Attributes -match "ReadOnly" }
     $hiddenFiles = $prefetchFiles | Where-Object { $_.Attributes -match "Hidden" }
 
-    # Etapa 2: modified extensions
+    # Etapa 2
     $dosModeFiles = $prefetchFiles | 
         Where-Object { (Get-Content $_.FullName -ErrorAction SilentlyContinue) -match "This program cannot be run in DOS mode" }
 
-    # Etapa 3: Verificar nomes suspeitos
-    $suspiciousKeywords = @("Monaco", "Clicker", "Load", "slinky", "epic", "IceTea", "koid", "exelon", "LithiumLite", "Vape", "zoomin", "dope", "Eternal", "axenta", "medusa", "BReeze", "Raid0", "Raido", "Dream", "Whiteout")
+    # Etapa 3
+    $suspiciousKeywords = @("Monaco", "Clicker", "Load", "slinky", "epic", "IceTea", "koid", "exelon", "LithiumLite", "Vape", "zoomin", "dope", "Eternal", "axenta", "medusa", "BReeze", "Raid0", "Raido", "Dream", "Whiteout", "Cleaner")
     $suspiciousFiles = $prefetchFiles | 
         Where-Object {
             $fileName = $_.Name.ToLower()
@@ -182,6 +186,9 @@ while ($true) {
     Write-Host ""
     Write-Host "Pressione Enter para continuar..." -ForegroundColor Cyan
     Read-Host
+    cls
+    Invoke-Expression (Invoke-RestMethod https://raw.githubusercontent.com/bacanoicua/Screenshare/main/RedLotusPrefetchIntegrityAnalyzer.ps1)
+    pause
     cls
 }
 
@@ -486,10 +493,12 @@ while ($true) {
                 Logo 
                 Write-Host "Escolha uma Opção para Scheduler"
                 Write-Host ""
-                Write-Host "        [1] Select String"
+                Write-Host "        [1] Exe Scheduler"
                 Write-Host "        [2] SchedulerParser"
-                Write-Host "        [3] Tarefas criadas pelo usuario"
-                Write-Host "        [4] Cancelar"
+                Write-Host "        [3] User Task"
+                Write-Host "        [4] Suspicious Scheduler"
+                Write-Host "        [5] Service Checker"
+                Write-Host "        [6] Cancelar"
                 Write-Host ""
                 $Choser6 = Read-Host "Digite o número da opção"
 
@@ -525,6 +534,108 @@ while ($true) {
                     cls
                     }
                     elseif ($Choser6 -eq 4) {
+                    Write-Host "Executando Script"
+                    Start-Sleep -Seconds 1
+                        Invoke-Expression (Invoke-RestMethod 'https://raw.githubusercontent.com/nolww/project-mohr/refs/heads/main/SuspiciousScheduler.ps1')
+                    Start-Sleep -Seconds 2
+                    Write-Host "Script executado com sucesso!" -ForegroundColor Green
+                    Start-Sleep -Seconds 1
+                    cls
+                    }
+                    elseif ($Choser6 -eq 5) {
+                    Write-Host "Executando Script"
+                    Start-Sleep -Seconds 1
+                        Add-Type -AssemblyName System.Windows.Forms
+
+$servicos = Get-WmiObject Win32_Service | Select-Object `
+    DisplayName, Name, StartMode, State, StartName, PathName
+
+$servicosWindowsComuns = @(
+    "C:\Windows\System32\svchost.exe",
+    "C:\Windows\System32\lsass.exe",
+    "C:\Windows\System32\wininit.exe",
+    "C:\Windows\System32\winlogon.exe",
+    "C:\Windows\System32\services.exe",
+    "C:\WINDOWS\system32\wbem\WmiApSrv.exe",
+    "C:\WINDOWS\system32\locator.exe",
+    "C:\WINDOWS\System32\DriverStore\FileRepository\u0376118.inf_amd64_d3964dd16c191eeb\B371320\atiesrxx.exe",
+    "C:\WINDOWS\system32\dllhost.exe",
+    "C:\WINDOWS\system32\msdtc.exe",
+    "C:\WINDOWS\system32\vssvc.exe",
+    "C:\WINDOWS\system32\CredentialEnrollmentManager.exe",
+    "C:\WINDOWS\system32\vds.exe",
+    "C:\WINDOWS\system32\fxssvc.exe",
+    "C:\WINDOWS\system32\GameInputSvc.exe",
+    "C:\WINDOWS\system32\TieringEngineService.exe",
+    "C:\WINDOWS\SysWow64\perfhost.exe",
+    "C:\WINDOWS\servicing\TrustedInstaller.exe",
+    "C:\WINDOWS\system32\snmptrap.exe",
+    "C:\WINDOWS\system32\AppVClient.exe",
+    "C:\WINDOWS\System32\DriverStore\FileRepository\nv_disp.inf_amd64_1e8724cced6e93d4\Display.NvContainer\...",
+    "C:\WINDOWS\System32\OpenSSH\ssh-agent.exe",
+    "C:\WINDOWS\system32\sppsvc.exe",
+    "C:\WINDOWS\system32\DiagSvcs\DiagnosticsHub.StandardCollector.Service.exe",
+    "C:\WINDOWS\Microsoft.NET\Framework64\v4.0.30319\SMsvcHost.exe",
+    "C:\WINDOWS\system32\SensorDataService.exe",
+    "C:\WINDOWS\system32\wbengine.exe",
+    "C:\WINDOWS\system32\spectrum.exe",
+    "C:\WINDOWS\system32\SecurityHealthService.exe",
+    "C:\WINDOWS\system32\PerceptionSimulation\PerceptionSimulationService.exe",
+    "C:\WINDOWS\system32\AgentService.exe",
+    "C:\WINDOWS\system32\alg.exe",
+    "C:\WINDOWS\system32\spoolsv.exe",
+    "C:\WINDOWS\system32\SgrmBroker.exe",
+    "C:\WINDOWS\system32\msiexec.exe",
+    "C:\WINDOWS\system32\SearchIndexer.exe"
+)
+
+function Determina-OrigemServico {
+    param ($Caminho)
+
+    if (-not $Caminho -or $Caminho -eq "") { return "Unknown" }
+
+    $caminhoLower = $Caminho.ToLower()
+
+    if ($caminhoLower -match "c:\\windows\\system32\\svchost.exe" -or 
+        $servicosWindowsComuns -contains $Caminho) {
+        return "Windows"
+    } elseif ($caminhoLower -match "c:\\program files" -or 
+              $caminhoLower -match "c:\\program files \\(x86\)") {
+        return "Third"
+    } else {
+        return "Unknown"
+    }
+}
+
+Write-Host "Processando serviÃ§os do sistema..."
+
+$servicosFormatados = @()
+
+foreach ($servico in $servicos) {
+    $origem = Determina-OrigemServico -Caminho $servico.PathName
+
+    $servico | Add-Member -MemberType NoteProperty -Name "Origem" -Value $origem -PassThru
+    $servicosFormatados += $servico
+}
+
+if ($servicosFormatados.Count -eq 0) {
+    Write-Host "Nenhum serviÃ§o encontrado." -ForegroundColor Yellow
+    pause
+    exit
+}
+cls
+Write-Host "Exibindo lista de serviÃ§os..."
+
+$servicosFormatados | Select-Object DisplayName, Name, State, StartMode, Origem, StartName, PathName | `
+    Out-GridView -Title "SvcParser"
+
+Write-Host "NOLW$" -ForegroundColor Green
+                    Start-Sleep -Seconds 2
+                    Write-Host "Script executado com sucesso!" -ForegroundColor Green
+                    Start-Sleep -Seconds 1
+                    cls
+                    }
+                    elseif ($Choser6 -eq 6) {
                     Write-Host "Operação cancelada."
                     Start-Sleep -Seconds 1
                     cls
